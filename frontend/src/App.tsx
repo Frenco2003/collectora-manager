@@ -1,35 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Provider, useSelector } from 'react-redux';
+import { Login } from './pages/Login';
+import type { RootState } from './redux/store';
+import store from './redux/store';
 
-function App() {
-  const [count, setCount] = useState(0)
+function AppContent() {
+  const { user, loading } = useSelector((state: RootState) => state.auth); // Ottieni lo stato da Redux
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Caricamento...</p>
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
+  }
+
+  // per ora, sempre e solo Login se non loggato
+  if (!user) {
+    return <Login />;
+  }
+
+  // quando avrai la dashboard vera, la metterai qui
+  return <div className="text-white">Sei loggato, qui ci sarà la dashboard</div>;
 }
 
-export default App
+function App() {
+  return (
+    <Provider store={store}> 
+      <AppContent /> {/* Il contenuto della tua app */}
+    </Provider>
+  );
+}
+
+export default App;
