@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
-import { validatePassword, type PasswordValidationResult } from '../../lib/passwordValidation';
+import { useEffect } from 'react';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { TextInput } from '../ui/TextInput';
 import { PasswordStrength } from '../ui/PasswordStrenght';
 import { Button } from '../ui/Button';
 import { Checkbox } from '../ui/Checkbox';
 import { ErrorMessage } from '../ui/ErrorMessage';
+import { useNavigate } from 'react-router-dom'; 
+import { validatePassword, type PasswordValidationResult } from '../../lib/passwordValidation';
 
 interface LoginFormProps {
   isLogin: boolean;
@@ -50,6 +51,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   success,
   loading,
 }) => {
+  const navigate = useNavigate();  // Definisci navigate
+
   useEffect(() => {
     if (!isLogin && password) {
       setPasswordValidation(validatePassword(password));
@@ -58,8 +61,19 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     }
   }, [password, isLogin]);
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSubmit(e);  // Usa handleSubmit passato come prop
+
+    if (isLogin) {
+      navigate('/dashboard');  // Dopo il login, naviga alla dashboard
+    } else {
+      navigate('/dashboard');  // Dopo la registrazione, naviga alla dashboard
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleFormSubmit} className="space-y-4">
       {!isLogin && <TextInput label="Nome Completo" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Mario Rossi" type="text" />}
       <TextInput label="Email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tua@email.com" type="email" />
       <TextInput label="Password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" type="password" />
@@ -87,7 +101,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       <ErrorMessage message={error} />
       <ErrorMessage message={success} isSuccess />
 
-      <Button loading={loading} isLogin={isLogin} onClick={handleSubmit} />
+      <Button loading={loading} isLogin={isLogin} onClick={handleFormSubmit} />
     </form>
   );
 };
