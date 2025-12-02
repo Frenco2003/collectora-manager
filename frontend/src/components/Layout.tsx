@@ -1,25 +1,30 @@
+// components/Layout.tsx
 import { useState } from 'react';
-import { Menu, LogOut, X, LayoutDashboard } from 'lucide-react';
+import { Menu, LogOut, X, LayoutDashboard, Package, Album } from 'lucide-react';
 import { useAuth } from '../hook/useAuth';
+
+export type PageId = 'dashboard' | 'catalog' | 'collections' ;
 
 interface LayoutProps {
   children: React.ReactNode;
-  currentPage: string;
-  onNavigate: (page: string) => void;
+  currentPage: PageId;
+  onNavigate: (page: PageId) => void;
 }
 
-const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+const menuItems: { id: PageId; label: string; icon: typeof LayoutDashboard }[] = [
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },  
+  { id: 'collections', label: 'Collezioni', icon: Album },
+  { id: 'catalog', label: 'Catalogo', icon: Package}
 ];
 
 export function Layout({ children, currentPage, onNavigate }: LayoutProps) {
-  const { user, handleLogout } = useAuth(); // uso il nome reale del tuo hook
+  const { user} = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex">
       {/* Sidebar */}
-      <aside
+      <div
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800/95 backdrop-blur-sm border-r border-gray-700 transform transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
@@ -27,7 +32,7 @@ export function Layout({ children, currentPage, onNavigate }: LayoutProps) {
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-6 border-b border-gray-700">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-              CollectHub
+              Collectora
             </h1>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -74,14 +79,10 @@ export function Layout({ children, currentPage, onNavigate }: LayoutProps) {
             </div>
           </div>
         </div>
-      </aside>
+      </div>
 
-      {/* Main content wrapper – prende TUTTO lo spazio restante */}
-      <div
-        className={`flex-1 min-h-screen w-full transition-all duration-300 ${
-          sidebarOpen ? 'lg:ml-64' : 'ml-0'
-        }`}
-      >
+      {/* Main Content */}
+      <div className={`transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'ml-0'} flex-1`}>
         {/* Header */}
         <header className="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-40">
           <div className="flex items-center justify-between px-6 py-4">
@@ -94,7 +95,6 @@ export function Layout({ children, currentPage, onNavigate }: LayoutProps) {
 
             <div className="flex items-center gap-4">
               <button
-                onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
               >
                 <LogOut size={18} />
@@ -104,10 +104,8 @@ export function Layout({ children, currentPage, onNavigate }: LayoutProps) {
           </div>
         </header>
 
-        {/* Main */}
-        <main className="w-full max-w-none px-6 lg:px-10 py-6 lg:py-8">
-          {children}
-        </main>
+        {/* Main content */}
+        <main className="p-6 lg:p-10 max-w-6xl mx-auto w-full">{children}</main>
       </div>
     </div>
   );
